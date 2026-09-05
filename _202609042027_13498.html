@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加微信好友</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #07c160 0%, #1aad19 100%);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #fff;
+        }
+        h1 { font-size: 22px; color: #333; margin-bottom: 8px; }
+        .wechat-id {
+            color: #07c160;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding: 10px 20px;
+            background: #f0fff0;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .btn {
+            background: linear-gradient(135deg, #07c160 0%, #1aad19 100%);
+            color: #fff;
+            border: none;
+            padding: 16px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .tip {
+            margin-top: 20px;
+            color: #999;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 16px 28px;
+            border-radius: 10px;
+            font-size: 15px;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="avatar">💬</div>
+                <div class="wechat-id" id="wechatId">jojo12399999</div>
+        <button class="btn" onclick="openWechat()">打开微信添加好友</button>
+        <p class="tip">点击按钮将自动复制微信号并打开微信<br>在微信搜索框粘贴即可添加</p>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const wechatId = 'jojo12399999'; // ⚠️ 改成你的微信号
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        function openWechat() {
+            // 1. 复制微信号到剪贴板
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(wechatId).then(() => {
+                    showToast('✓ 已复制微信号');
+                    setTimeout(tryOpenWechat, 800);
+                }).catch(() => {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+        }
+
+        function fallbackCopy() {
+            const input = document.createElement('input');
+            input.value = wechatId;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            showToast('✓ 已复制微信号');
+            setTimeout(tryOpenWechat, 800);
+        }
+
+        function tryOpenWechat() {
+            // 2. 尝试唤起微信
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+
+            if (isIOS) {
+                // iOS 尝试 Universal Link
+                window.location.href = 'weixin://';
+            } else if (isAndroid) {
+                // Android 尝试 Intent
+                window.location.href = 'weixin://';
+            } else {
+                showToast('请在手机上打开此页面');
+            }
+        }
+    </script>
+</body>
+</html>
